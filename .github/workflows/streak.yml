@@ -1,0 +1,29 @@
+name: Maintain GitHub Streak
+
+on:
+  schedule:
+    - cron: '0 12 * * *' # Runs every day at 12:00 UTC (5:30 PM IST)
+  workflow_dispatch: # Allows you to trigger it manually to test it
+
+permissions:
+  contents: write # Grants the workflow permission to push changes back to the repo
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Make a dummy change
+      run: |
+        touch heartbeat.txt
+        date >> heartbeat.txt
+
+    - name: Commit and Push
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git add heartbeat.txt
+        git commit -m "chore: daily heartbeat streak upkeep" || echo "No changes to commit"
+        git push
